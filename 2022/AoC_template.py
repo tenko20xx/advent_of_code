@@ -9,8 +9,10 @@ def part2(inp):
     pass
 
 def main():
-    AoC.parse_args()
-    inp = AoC.get_input("7")
+    AoC.set_day("9")
+    args = AoC.parse_args()
+
+    inp = AoC.get_input()
     print("== Part 1 ==")
     part1(inp)
     print("== Part 2 ==")
