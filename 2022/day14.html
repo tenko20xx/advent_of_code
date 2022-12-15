@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Advent of Code - 2022 - Day 14</title>
+        <style type="text/css">
+body {
+    margin: 0;
+    padding: 32px;
+    font-family: sans-serif;
+}
+label {
+    font-weight: bold;
+}
+#output {
+    background: black;
+    color: lime;
+    font-weight: bold;
+}
+        </style>
+        <script>
+class Point {
+    constructor(x,y) {
+        if (isNaN(x) || isNaN(y)) {
+            console.error("Point x and y must both be non-NaN integers");
+            return false;
+        }
+        this.x = x;
+        this.y = y;
+    }
+
+    toString() {
+        return "Point("+this.x + "," + this.y+")";
+    }
+}
+class Scene {
+    constructor(sand_pos,floor=null) {
+        this.sand_pos = sand_pos;
+        this.units = {};
+        this.units[sand_pos] = "+";
+        this.floor = floor;
+        this.min_x = sand_pos.x;
+        this.min_y = sand_pos.y;
+        this.max_x = sand_pos.x;
+        this.max_y = sand_pos.y;
+        if (this.floor != null) this.max_y += floor;
+        this.resting_sand = 0;
+    }
+
+    addObject(p,o) {
+        this.units[p] = o;
+        if (p.x < this.min_x) this.min_x = p.x;
+        if (p.y < this.min_y) this.min_y = p.y;
+        if (p.x > this.max_x) this.max_x = p.x;
+        if (p.y > this.max_y) this.max_y = p.y;
+        if(p.x == this.sand_pos.x && p.y == this.sand_pos.y) {
+            this.sand_pos = null;
+        }
+    }
+
+    addRock(p) {
+        this.addObject(p,"#");
+        if (this.floor != null) {
+            if(p.y + this.floor > this.max_y) this.max_y = p.y + this.floor;
+        }
+    }
+
+    addSand(p) {
+        this.addObject(p,"o");
+        this.resting_sand++;
+    }
+
+    addRockLine(from_p,to_p) {
+        this.addRock(from_p);
+        if(from_p.x != to_p.x) {
+            let dir = from_p.x > to_p.x ? 1 : -1;
+            for(let x = to_p.x; x != from_p.x; x += dir) {
+                this.addRock(new Point(x,from_p.y));
+            }
+        } else if(from_p.y != to_p.y) {
+            let dir = from_p.y > to_p.y ? 1 : -1;
+            for(let y = to_p.y; y != from_p.y; y += dir) {
+                this.addRock(new Point(from_p.x,y));
+            }
+        }
+    }
+
+    dropSand() {
+        if(this.sand_pos == null) return false;
+        let sand = new Point(this.sand_pos.x,this.sand_pos.y);
+        let resting = false;
+        while (!resting && sand.y <= this.max_y) {
+            resting = true;
+            if (this.floor != null && sand.y >= this.max_y) break;
+            let try_p = [
+                new Point(sand.x,sand.y+1), 
+                new Point(sand.x-1,sand.y+1), 
+                new Point(sand.x+1,sand.y+1)
+            ];
+            for(let p of try_p) {
+                if(this.units[p] == null) {
+                    sand = p;
+                    resting = false;
+                    break;
+                }
+            }
+        }
+        if(resting) {
+            this.addSand(sand);
+            return true;
+        }
+        return false;
+    }
+
+    toString() {
+        let s = "";
+        let w = (this.max_y+1).toString().length;
+        for(let y = this.min_y; y <= this.max_y; y++) {
+            for(let ns=w - y.toString().length; ns > 0; ns--) s += " ";
+            s += y + " ";
+            let p = new Point(0,y);
+            for(let x = this.min_x - 2; x <= this.max_x + 2; x++) {
+                p.x = x;
+                if(this.units[p]) s += this.units[p];
+                else s += ".";
+            }
+            s += "\n";
+        }
+        if(this.floor != null) {
+            s += (this.max_y + 1) + " ";
+            for(let x = this.min_x - 2; x <= this.max_x + 2; x++) {
+                s += "#";
+            }
+            s += "\n";
+        }
+        for(let x = this.min_x - 2; x <= this.max_x + w + 3; x++) {
+            s += "=";
+        }
+        s += "\n";
+        return s;
+    }
+}
+
+var anim_interval = -1;
+var frames;
+
+function run_simulation(animate) {
+    if(anim_interval != -1) return;
+    document.getElementById("btn_go").disabled = true;
+    document.getElementById("btn_anim").disabled = true;
+    let sp = document.getElementById("input_sand").value.split(",");
+    if(sp.length != 2) {
+        console.error("Sand Start should be 2 ints separated by a comma");
+        return;
+    }
+    sp_x = parseInt(sp[0]);
+    sp_y = parseInt(sp[1]);
+    let sand_pos = new Point(sp_x, sp_y);
+    let floor = parseInt(document.getElementById("input_floor").value);
+    if(isNaN(floor)) floor = null;
+    let scene = new Scene(sand_pos,floor);
+    for(line of document.getElementById("input_input").value.split("\n")) {
+        let p1 = null;
+        let p2 = null;
+        for(pair of line.split(" -> ")) {
+            let px = parseInt(pair.split(",")[0]);
+            let py = parseInt(pair.split(",")[1]);
+            p1 = p2;
+            p2 = new Point(px,py);
+            if(p1 == null) {
+                continue;
+            }
+            scene.addRockLine(p1,p2);
+        }
+    }
+
+    if(animate) {
+        anim_interval = setInterval(() => {
+            document.getElementById("output").innerHTML = "Units of resting sand: " + scene.resting_sand + "\n\n" + scene;
+            if(!scene.dropSand()) {
+                clearInterval(anim_interval);
+                anim_interval = -1;
+                
+                document.getElementById("btn_go").disabled = false;
+                document.getElementById("btn_anim").disabled = false;
+            }
+        },30);
+    } else {
+        setTimeout(() => {
+            while(scene.dropSand());// frames.push("Units of resting sand: " + scene.resting_sand + "\n\n" + scene);
+
+            document.getElementById("output").innerHTML = "Units of resting sand: " + scene.resting_sand + "\n\n" + scene;
+            
+            document.getElementById("btn_go").disabled = false;
+            document.getElementById("btn_anim").disabled = false;
+        },10);
+    }
+}
+
+function run_animation() {
+    let btn = document.getElementById("btn_anim");
+    if(anim_interval != -1) return;
+    btn.disabled = true;
+    let frame_num = 0;
+    anim_interval = setInterval(() => {
+        document.getElementById("output").innerHTML = frames[frame_num];
+        frame_num++;
+        if(frame_num >= frames.length) {
+            clearInterval(anim_interval);
+            anim_interval = -1;
+            btn.disabled = false;
+        }
+    },30);
+}
+
+function change_fontsize(ev) {
+    document.getElementById("output").style.fontSize = ev.target.value + "px";
+}
+        </script>
+    </head>
+    <body>
+        <p>
+            <label>Sand Start:</label> <input type="text" size="6" id="input_sand" value="500,0" /> (where sand will pour from) | 
+            <label>Floor:</label> <input type="text" size="1" id="input_floor" /> (leave blank for void / no floor)
+        </p>
+        <p><label>Input:</label><br />
+        <textarea id="input_input"></textarea></p>
+        <button onclick="run_simulation(false);" id="btn_go">Go!</button> | <button id="btn_anim" onclick="run_simulation(true);">Animate</button><br /><br />
+        <label>Font size:</label> <input type="text" id="input_fontsize" value="10" oninput="change_fontsize(event)"/>
+        <pre id="output"></pre>
+    </body>
+</html>
