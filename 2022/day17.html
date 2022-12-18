@@ -1,0 +1,532 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Advent of Code - 2022 - Day 17</title>
+        <style type="text/css">
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+label {
+    font-weight: bold;
+}
+#output {
+    background: black;
+    color: lime;
+    font-weight: bold;
+}
+section#parameters {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 176px;
+    padding: 32px;
+    height: calc(100% - 64px);
+    overflow: auto;
+}
+
+#parameters p {
+    margin: 8px 0;
+}
+
+section#output_cont {
+    position: absolute;
+    left: 240px;
+    top: 0;
+    padding: 0;
+    width: calc(100% - 240px);
+    height: 100%;
+    overflow: auto;
+    background: black;
+}
+
+#output_cont pre {
+    margin: 32px;
+}
+
+textarea#input_rocks {
+    width: 4em;
+    height: 16em;
+}
+        </style>
+        <script>
+window.addEventListener('load', ev => {
+	change_fontsize();
+});
+class Point {
+    constructor(x,y) {
+        if (isNaN(x) || isNaN(y)) {
+            console.error("Point x and y must both be non-NaN integers");
+            return false;
+        }
+        this.x = x;
+        this.y = y;
+    }
+
+    toString() {
+        return "Point("+this.x + "," + this.y+")";
+    }
+}
+
+class Rock {
+    constructor(txt) {
+        this.units = {};
+        this.width = 0;
+        this.height = 0;
+        let x = 0;
+        let y = 0;
+        txt.split("\n").reverse().forEach(row => {
+            x = 0;
+            if(row != "") {
+                row.split("").forEach(it => {
+                    if (it == "#") {
+                        this.units[new Point(x,y)] = "#";
+                        if (x+1 > this.width) this.width = x+1;
+                        if (y+1 > this.height) this.height = y+1;
+                    }
+                    x++;
+                });
+                y++;
+            }
+        });
+    }
+
+    toString() {
+        let s = "";
+        for(let y=this.height;y>=0;y--) {
+            for(let x=0;x<=this.width;x++) {
+                if(this.units[new Point(x,y)]) s += "@";
+                else s += ".";
+            }
+            s += "\n";
+        }
+        return s;
+    }
+}
+
+class Scene {
+    constructor(width,airstream) {
+        this.width = 7;
+        this.airstream = airstream;
+        this.airpos = -1;
+        this.units = {};
+        this.highest_rock = 0;
+        this.highest_point = 2;
+        this.falling_rock = null;
+        this.falling_rock_pos = null;
+        this.first_repeat = -1;
+        this.first_occurence_set = {};
+    }
+
+    addRock(p) {
+        //console.log("addRock(" + p + ")");
+        this.units[p] = "#";
+        if(p.y > this.highest_rock) {
+            this.highest_rock = p.y;
+        }
+    }
+
+    addFallingRock(rock) {
+        this.falling_rock = rock;
+        this.falling_rock_pos = new Point(3,this.highest_rock + 4);
+        if(this.falling_rock_pos.y + this.falling_rock.height > this.highest_point) this.highest_point = this.falling_rock_pos.y + this.falling_rock.height;
+    }
+
+    getAir() {
+        this.airpos++;
+        if(this.airpos >= this.airstream.length) this.airpos -= this.airstream.length;
+        return this.airstream[this.airpos];
+    }
+
+    peekAir() {
+        if(this.airpos < 0) return " ";
+        return this.airstream[this.airpos];
+    }
+
+    moveFallingRock() {
+        if(this.falling_rock == null) return false;
+        let resting = false;
+        let hmove = this.getAir();
+        if(hmove == "<") {
+            let can_move = true;
+            if (this.falling_rock_pos.x <= 1) can_move = false;
+            
+            for(let y=0;y<this.falling_rock.height;y++) {
+                for(let x=0;x<this.falling_rock.width;x++) {
+                    let ry = this.falling_rock_pos.y + y;
+                    let rx = this.falling_rock_pos.x + x;
+                    if(
+                        this.units[new Point(rx-1,ry)] != null &&
+                        this.falling_rock.units[new Point(x,y)] != null
+                        ) can_move = false;
+                }
+            }
+            if(can_move) this.falling_rock_pos.x--;
+        } else if (hmove == ">") {
+            let can_move = true;
+            if (this.falling_rock_pos.x + this.falling_rock.width > this.width) can_move = false;
+            
+            for(let y=0;y<this.falling_rock.height;y++) {
+                for(let x=0;x<this.falling_rock.width;x++) {
+                    let ry = this.falling_rock_pos.y + y;
+                    let rx = this.falling_rock_pos.x + x;
+                    if(
+                        this.units[new Point(rx+1,ry)] != null &&
+                        this.falling_rock.units[new Point(x,y)] != null
+                        ) can_move = false;
+                }
+            }
+            if(can_move) this.falling_rock_pos.x++;
+        }
+        let can_move = true;
+        if (this.falling_rock_pos.y <= 1) can_move = false;
+        for(let y=0;y<this.falling_rock.height;y++) {
+            for(let x=0;x<this.falling_rock.width;x++) {
+                let ry = this.falling_rock_pos.y + y;
+                let rx = this.falling_rock_pos.x + x;
+                if(
+                    this.units[new Point(rx,ry-1)] != null &&
+                    this.falling_rock.units[new Point(x,y)] != null
+                    ) can_move = false;
+            }
+        }
+        if(can_move) {
+            this.falling_rock_pos.y--;
+        } else {
+            //console.log("place rock");
+            //console.log(this.falling_rock);
+            for(let y=0;y<this.falling_rock.height;y++) {
+                let ry = this.falling_rock_pos.y + y;
+                for(let x=0;x<this.falling_rock.width;x++) {
+                    let rx = this.falling_rock_pos.x + x;
+                    
+                    //console.log("check rock (" + x + "," + y + "), put at (" + rx + "," + ry + ")");
+                    if(this.falling_rock.units[new Point(x,y)] == "#") this.addRock(new Point(rx,ry));
+                }
+            }
+            this.falling_rock = null;
+            this.falling_rock_pos = null;
+            return false
+        }
+        return true;
+    }
+
+    toString() {
+        let s = "";
+        let w = this.highest_point.toString().length;
+        for(let y = this.highest_point-1; y > 0; y--) {
+            for(let sp=0; sp <= w - y.toString().length; sp++) s += " ";
+            s += y + " |";
+            let p = new Point(0,y);
+            for(let x = 1; x <= this.width; x++) {
+                p.x = x;
+                
+                let unit = null;
+                if(this.falling_rock != null) {
+                    let rp = new Point(x - this.falling_rock_pos.x,y - this.falling_rock_pos.y);
+                    unit = this.falling_rock.units[rp] ? "@" : null;
+                }
+                if(!unit) {
+                    if (this.units[p]) unit = this.units[p];
+                    else unit = ".";
+                }
+                s += unit;
+            }
+            s += "| " + this.hexline(y);
+            if(y == this.highest_point-1) s += " " + this.peekAir();
+            s += "\n";
+        }
+        for(let sp=0; sp <= w + 1; sp++) s += " ";
+        s += "+";
+        for(let x = 1; x <= this.width; x++) {
+            s += "-";
+        }
+        s += "+\n";
+        return s;
+    }
+
+    encodeline(line) {
+        let p = new Point(0,line);
+        let n = 0;
+        for(let x = this.width; x >= 1; x--) {
+            n = n << 1;
+            p.x = x;
+            if (this.units[p]) n = n | 1;
+        }
+        return n;
+    }
+
+    encodeTower() {
+        let a = [];
+        for(let y = this.highest_rock; y > 0; y--) {            
+            a.push(this.encodeline(y));
+        }
+        return a;
+    }
+
+    hexline(line) {
+        let n = this.encodeline(line);
+        let sn = n.toString(16);
+        if (n < 16) sn = "0" + sn;
+        return sn;
+    }
+
+    hexdumpTower() {
+        let s = "";
+        for(let y = this.highest_rock; y > 0; y--) {
+            if (s != "") s += " ";            
+            s += this.hexline(y);
+        }
+        return s;
+    }
+}
+
+var anim_interval = -1;
+
+function find_repitition(a) {
+    let discard = 0;
+    let mask = 0;
+    while(a.length > 0 && mask != 0b1111111) {
+        mask = mask | a.shift();
+        discard += 1;
+    }
+    console.log(discard);
+    let repeats = false;
+    let l = a.length >> 1;
+    let s = 0;
+    console.log("starting ss len: " + l);
+    while(l > 0) {
+        s = 0;
+        while(s < a.length - l) {
+            console.log("Check for repeat -> s: " + s + ", len: " + l);
+            repeats = true;
+            for(let i=s;i<a.length;i++) {
+                if(a[i] != a[i+l]) {
+                    repeats = false;
+                    break;
+                }
+            }
+            if(repeats) {
+                break;
+            } else {
+                s += 1;
+            }
+        }
+        if(repeats) {
+            break;
+        } else {
+            l -= 1;
+        }
+    }
+    console.log(repeats);
+    if(repeats) {
+        console.log(s,l);
+        let ss = [];
+        for(let i=s;i<=s+l;i++) {
+            ss.push(a[i]);
+        }
+        console.log(ss);
+    }
+}
+
+function run_simulation(animate) {
+    if(anim_interval != -1) return;
+    document.getElementById("btn_go").disabled = true;
+    document.getElementById("btn_anim").disabled = true;
+
+    let width = parseInt(document.getElementById("input_width").value);
+    let rocks = [];
+    let rock_txt = document.getElementById("input_rocks").value;
+    let rock_buf = "";
+    rock_txt.split("\n").forEach(line => {
+        if (line.trim() == "") {
+            if(rock_buf != "") {
+                rocks.push(new Rock(rock_buf));
+            }
+            rock_buf = "";
+        } else {
+            rock_buf += line + "\n";
+        }
+    });
+    if(rock_buf != "") rocks.push(new Rock(rock_buf))
+
+    let airstream_str = document.getElementById("input_input").value;
+    let airstream = "";
+    for(let i=0;i<airstream_str.length;i++) {
+        let l = airstream_str[i];
+        if(l == "<" || l == ">") airstream += l;
+    }
+    let total_rocks = parseInt(document.getElementById("input_total_rocks").value);
+    
+    let scene = new Scene(width,airstream);
+    let current_rock = -1;
+    let num_rocks = 0;
+
+    let last_airpos_rocknum = {};
+    let residual = 0;
+    let rock_num_to_height = {};
+    let last_rock_seen = -1;
+    let looking_for_repition = true;
+    let crazy_big_number = 1000000000000;
+    let crazy_height = -1;
+    let first_repeating_rock = -1;
+    let num_repeating_rocks = 0;
+    let repetition_height = 0;
+    if(animate) {
+        document.getElementById("output").innerHTML = "Num rocks: 0\nHighest rock height: " + scene.highest_rock + "\n\n" + scene;
+        anim_interval = setInterval(() => {
+            if(!scene.moveFallingRock()) {
+                //console.log(scene.hexdumpTower());
+                //let a = scene.encodeTower();
+                //find_repitition(a);
+                if(num_rocks > 0 && looking_for_repition) {
+                    rock_num_to_height[num_rocks] = scene.highest_rock;
+                    let key = (num_rocks % rocks.length) + "-" + scene.airpos;
+                    //console.log(num_rocks + ":" + scene.highest_rock + ":" + key);
+                    if(last_airpos_rocknum[key] == null) {
+                        last_airpos_rocknum[key] = num_rocks;
+                        last_rock_seen = false;
+                    } else {
+                        //console.log(key + " first seen at rock " + last_airpos_rocknum[key]);
+                        if(last_rock_seen == last_airpos_rocknum[key] - 1) {
+                            first_repeating_rock = last_rock_seen;
+                            num_repeating_rocks = (num_rocks - 1) - first_repeating_rock;
+                            repetition_height = rock_num_to_height[(num_rocks - 1)] - rock_num_to_height[last_rock_seen];
+                            let n = crazy_big_number - first_repeating_rock;
+                            let num_repeats = Math.floor(n / num_repeating_rocks);
+                            let remaining_rocks = n - (num_repeats * num_repeating_rocks);
+                            let remaining_height = rock_num_to_height[first_repeating_rock+remaining_rocks] - rock_num_to_height[first_repeating_rock];
+                            crazy_height = num_repeats * repetition_height + remaining_height + rock_num_to_height[first_repeating_rock];
+                            //console.log("Height at " + crazy_big_number + " rocks: " + crazy_height);
+                            looking_for_repition = false;
+                        }
+                        last_rock_seen = last_airpos_rocknum[key];
+                    }
+                }
+                if(num_rocks >= total_rocks) {
+                    clearInterval(anim_interval);
+                    anim_interval = -1;
+                    
+                    document.getElementById("btn_go").disabled = false;
+                    document.getElementById("btn_anim").disabled = false;
+                } else {
+                    current_rock++;
+                    if (current_rock >= rocks.length) current_rock -= rocks.length;
+                    scene.addFallingRock(rocks[current_rock]);
+                    num_rocks++;
+                }
+            }
+            if(looking_for_repition) {
+                document.getElementById("output").innerHTML = "";
+            } else {
+                document.getElementById("output").innerHTML = 
+                    "After " + first_repeating_rock + " rocks (height: " + rock_num_to_height[first_repeating_rock] + 
+                    "), a repeating pattern of height " + repetition_height + " occurs every " + num_repeating_rocks + " rocks\n" +
+                    "At " + crazy_big_number + " rocks, the height will be " + crazy_height + "\n\n";
+            }
+            document.getElementById("output").innerHTML += "Num rocks: " + num_rocks + "\nHighest rock height: " + scene.highest_rock + "\n\n" + scene;
+        },parseInt(document.getElementById("input_animdelay").value));
+    } else {
+        setTimeout(() => {
+            while(true) {
+                while(scene.moveFallingRock());
+                if(num_rocks > 0 && looking_for_repition) {
+                    rock_num_to_height[num_rocks] = scene.highest_rock;
+                    let key = (num_rocks % rocks.length) + "-" + scene.airpos;
+                    //console.log(num_rocks + ":" + scene.highest_rock + ":" + key);
+                    if(last_airpos_rocknum[key] == null) {
+                        last_airpos_rocknum[key] = num_rocks;
+                        last_rock_seen = false;
+                    } else {
+                        //console.log(key + " first seen at rock " + last_airpos_rocknum[key]);
+                        if(last_rock_seen == last_airpos_rocknum[key] - 1) {
+                            first_repeating_rock = last_rock_seen;
+                            num_repeating_rocks = (num_rocks - 1) - first_repeating_rock;
+                            repetition_height = rock_num_to_height[(num_rocks - 1)] - rock_num_to_height[last_rock_seen];
+                            let n = crazy_big_number - first_repeating_rock;
+                            let num_repeats = Math.floor(n / num_repeating_rocks);
+                            let remaining_rocks = n - (num_repeats * num_repeating_rocks);
+                            let remaining_height = rock_num_to_height[first_repeating_rock+remaining_rocks] - rock_num_to_height[first_repeating_rock];
+                            crazy_height = num_repeats * repetition_height + remaining_height + rock_num_to_height[first_repeating_rock];
+                            //console.log("Height at " + crazy_big_number + " rocks: " + crazy_height);
+                            looking_for_repition = false;
+                        }
+                        last_rock_seen = last_airpos_rocknum[key];
+                    }
+                }
+                if(num_rocks >= total_rocks) break;
+                current_rock++;
+                if (current_rock >= rocks.length) current_rock -= rocks.length;
+                scene.addFallingRock(rocks[current_rock]);
+                num_rocks++;
+            }
+            
+            if(looking_for_repition) {
+                document.getElementById("output").innerHTML = "";
+            } else {
+                document.getElementById("output").innerHTML = 
+                    "After " + first_repeating_rock + " rocks (height: " + rock_num_to_height[first_repeating_rock] + 
+                    "), a repeating pattern of height " + repetition_height + " occurs every " + num_repeating_rocks + " rocks\n" +
+                    "At " + crazy_big_number + " rocks, the height will be " + crazy_height + "\n\n";
+            }
+            document.getElementById("output").innerHTML += "Num rocks: " + num_rocks + "\nHighest rock height: " + scene.highest_rock + "\n\n" + scene;
+            
+            document.getElementById("btn_go").disabled = false;
+            document.getElementById("btn_anim").disabled = false;
+        },10);
+    }
+}
+
+function change_fontsize(ev) {
+    var el;
+    if (ev) {
+        el = ev.target;
+    } else {
+        el = document.getElementById("input_fontsize");
+    }
+    document.getElementById("output").style.fontSize = el.value + "px";
+}
+        </script>
+    </head>
+    <body>
+	<section id="parameters">
+        <p>
+            <label>Chamber Width:</label> <input type="text" size="1" id="input_width" value="7" />
+        </p>
+        <p>
+            <label>Total Rocks:</label> <input type="text" size="4" id="input_total_rocks" value="2022" />
+        </p>
+	<p>
+		<label>Rock Shapes:</label><br /><span style="font-size:10px">(blank line between each type)</span><br />
+		<textarea id="input_rocks">####
+
+.#.
+###
+.#.
+
+..#
+..#
+###
+
+#
+#
+#
+#
+
+##
+##</textarea>
+	</p>
+        <p>
+		<label>Input:</label><br />
+		<textarea id="input_input">&gt;&gt;&gt;&lt;&lt;&gt;&lt;&gt;&gt;&lt;&lt;&lt;&gt;&gt;&lt;&gt;&gt;&gt;&lt;&lt;&lt;&gt;&gt;&gt;&lt;&lt;&lt;&gt;&lt;&lt;&lt;&gt;&gt;&lt;&gt;&gt;&lt;&lt;&gt;&gt;</textarea>
+	</p>
+        <button onclick="run_simulation(false);" id="btn_go">Go!</button> | <button id="btn_anim" onclick="run_simulation(true);">Animate</button><br /><br />
+        <label>Font size:</label> <input type="text" id="input_fontsize" value="10" size="2" oninput="change_fontsize(event)"/><br />
+        <label>Anim Delay:</label> <input type="text" id="input_animdelay" value="30" size="3" />
+	</section>
+	<section id="output_cont">
+        	<pre id="output"></pre>
+	</section>
+    </body>
+</html>
