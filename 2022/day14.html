@@ -223,7 +223,8 @@ function change_fontsize(ev) {
             <label>Floor:</label> <input type="text" size="1" id="input_floor" /> (leave blank for void / no floor)
         </p>
         <p><label>Input:</label><br />
-        <textarea id="input_input"></textarea></p>
+        <textarea id="input_input">498,4 -&gt; 498,6 -&gt; 496,6
+503,4 -&gt; 502,4 -&gt; 502,9 -&gt; 494,9</textarea></p>
         <button onclick="run_simulation(false);" id="btn_go">Go!</button> | <button id="btn_anim" onclick="run_simulation(true);">Animate</button><br /><br />
         <label>Font size:</label> <input type="text" id="input_fontsize" value="10" oninput="change_fontsize(event)"/>
         <pre id="output"></pre>
