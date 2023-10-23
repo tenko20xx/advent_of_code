@@ -140,9 +140,9 @@ def main():
     args = AoC.parse_args(parser)
 
     inp = AoC.get_input()
-    print("== Part 1 ==")
+    print("--- Part 1 ---")
     part1(inp,args.draw_positions)
-    print("== Part 2 ==")
+    print("--- Part 2 ---")
     part2(inp,args.draw_positions)
 
 if __name__ == "__main__":

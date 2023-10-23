@@ -128,9 +128,9 @@ def part2(inp):
 def main():
     AoC.parse_args()
     inp = AoC.get_input("7")
-    print("== Part 1 ==")
+    print("--- Part 1 ---")
     part1(inp)
-    print("== Part 2 ==")
+    print("--- Part 2 ---")
     part2(inp)
 
 if __name__ == "__main__":

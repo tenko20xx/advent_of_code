@@ -58,7 +58,7 @@ def p2_strat2(p1,p2):
     raise Exception("Invalid play: {} - {}".format(p1,p2))
 
 def main():
-    print("== Part 1 ==")
+    print("--- Part 1 ---")
     score = 0
     with open("inputs/day2.input",'r') as fp:
         for line in fp:
@@ -76,7 +76,7 @@ def main():
             score += outcome_score(p1,p2)
     print("Score: {}".format(score))
 
-    print("== Part 2 ==")
+    print("--- Part 2 ---")
     score = 0
     with open("inputs/day2.input",'r') as fp:
         for line in fp:

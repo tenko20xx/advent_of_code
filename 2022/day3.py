@@ -7,7 +7,7 @@ def getValue(l):
     return (v - ord('A')) + 27
 
 def main():
-    print("== Part 1 ==")
+    print("--- Part 1 ---")
     total = 0
     with open("inputs/day3.input",'r') as fp:
         for pack in fp:
@@ -22,7 +22,7 @@ def main():
                     break
     print("Total: {}".format(total))
 
-    print("== Part 2 ==")
+    print("--- Part 2 ---")
     total = 0
     group = []
     with open("inputs/day3.input",'r') as fp:
