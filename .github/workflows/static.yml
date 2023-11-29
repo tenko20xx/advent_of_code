@@ -25,13 +25,13 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: "https://tenko20xx.github.com/advent_of_code"
+      url: "https://tenko20xx.github.io/advent_of_code"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - run: mkdir _site
-      - run: cp 2022/*.html _site/
+      - run: mkdir -pv _site/2022/
+      - run: cp 2022/*.html _site/2022/
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
