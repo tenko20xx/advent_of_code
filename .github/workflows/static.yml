@@ -30,13 +30,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - run: mkdir _site
+      - run: cp 2022/*.html _site/
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: aoc_html_solves
-          path: 2022/day14.html
+        uses: actions/upload-pages-artifact@v2
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
