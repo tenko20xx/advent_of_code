@@ -22,7 +22,7 @@ namespace AoCModules {
 #endif
 """
 
-def main():
+def gen_header(silent=False):
     days = []
     for f in os.listdir():
         if f.startswith("day") and f.endswith(".cpp"):
@@ -33,9 +33,13 @@ def main():
     output = HEADER_TEMPLATE
     output = output.replace("{{functions}}",functions)
     output = output.replace("{{modules}}",modules)
-    print(output)
+    if not silent:
+        print(output)
     with open("AoC_modules.h",'w') as fp:
         fp.write(output)
 
+def _main():
+    gen_header()
+
 if __name__ == "__main__":
-    main()
+    _main()
