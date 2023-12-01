@@ -3,7 +3,7 @@
 import AoC
 
 def main():
-    inp = AoC.getInput("1")
+    inp = AoC.get_input("1")
     elvs_cals = []
     elf = 1
     this_cals = 0
