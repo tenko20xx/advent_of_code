@@ -7,12 +7,14 @@
 #include "AoC.h"
 
 AoC *day1_create(bool test);
+AoC *day2_create(bool test);
 
 using ModuleFuncPtr = AoC* (*)(bool);
 
 namespace AoCModules {
 	std::map<std::string,ModuleFuncPtr> modules = {
-		{"day1", day1_create}
+		{"day1", day1_create},
+		{"day2", day2_create}
 	};
 };
 
