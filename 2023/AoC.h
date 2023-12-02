@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <exception>
+#include <vector>
 
 class AoC {
 	public:
@@ -13,12 +15,30 @@ class AoC {
 		std::string getInputFileName(std::string subpart);
 		std::ifstream getInputFile();
 	       	std::ifstream getInputFile(std::string subpart);
-		virtual bool part1() { std::cout << "-- Part 1 --" << std::endl; return false; };
-		virtual bool part2() { std::cout << "-- Part 2 --" << std::endl; return false; };
+		virtual bool part1() = 0;
+		virtual bool part2() = 0;
 		AoC(bool test_mode = false);
 	protected:
 		bool test_mode;
 		std::string name;
 };
+
+
+class ParseException : public std::exception {
+	public:
+	const char* what();
+	const std::string getMessage();
+	ParseException(int l, std::string emsg);
+	private:
+	int line;
+	std::string message = "";
+};
+
+std::vector<std::string> string_split(std::string s, std::string delim);
+
+inline void string_trim(std::string& str) {
+	str.erase(str.find_last_not_of(" ")+1);
+	str.erase(0, str.find_first_not_of(" "));
+}
 
 #endif

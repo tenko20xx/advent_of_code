@@ -16,18 +16,20 @@ class Day{{N}} : public AoC {
 	bool part2() override;
 };
 
+namespace Day{{N}}NS {
+
+};
+
 bool Day{{N}}::part1() {
-    std::cout << "-- Part 1 --" << std::endl;
-    return false;
+	return false;
 }
 
 bool Day{{N}}::part2() {
-    std::cout << "-- Part 2 --" << std::endl;
-    return false;
+	return false;
 }
 
 Day{{N}} *day{{N}}_create(bool test) {
-    return new Day{{N}}(test);
+	return new Day{{N}}(test);
 }
 """
 

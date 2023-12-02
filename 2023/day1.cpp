@@ -12,7 +12,6 @@ class Day1 : public AoC {
 };
 
 bool Day1::part1() {
-	std::cout << "-- Part 1 --" << std::endl;
 	//std::cout << this->getInputFileName() << std::endl;
 	std::ifstream file = this->getInputFile();
 	std::string line;
@@ -43,7 +42,6 @@ bool Day1::part1() {
 }
 
 bool Day1::part2() {
-	std::cout << "-- Part 2 --" << std::endl;
 	std::map<std::string,int> searches = {
 		{"0", 0},
 		{"1", 1},

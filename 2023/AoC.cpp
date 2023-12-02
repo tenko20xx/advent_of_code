@@ -32,6 +32,38 @@ std::ifstream AoC::getInputFile(std::string subpart) {
 	return fp;
 }
 
+const char* ParseException::what() {
+	return "Parsing Exception";
+}
+
+const std::string ParseException::getMessage() {
+	return "Error parsing input file on line " + std::to_string(line) + ": " + message;
+}
+
+ParseException::ParseException(int l, std::string emsg) : line(l), message(emsg) { }
+
+////////////////////////////////
+// Stand-alone utilities
+//////////////////////////////
+std::vector<std::string> string_split(std::string s, std::string delim) {
+	std::vector<std::string> parts;
+	std::size_t i = 0;
+	std::size_t pos;
+	while(true) {
+		pos = s.find(delim,i);
+		if(pos == s.npos) {
+			parts.push_back(s.substr(i));
+			break;
+		}
+		parts.push_back(s.substr(i,pos-i));
+		i = pos + 1;
+	}
+	return parts;
+}
+//////////////////////////////
+// Stand-alone utilities
+////////////////////////////////
+
 struct Options {
 	std::string exec_day = "";
 	bool test_mode = false;
@@ -118,6 +150,7 @@ int main(int argc, char** argv) {
 		std::cout << "** " << opts.exec_day << " **" << std::endl << std::endl;
 		bool okay;
 		if (opts.exec_part1) {
+			std::cout << "-- Part 1 --" << std::endl;
 			okay = puzzle->part1();
 			if(!okay) {
 				std::cerr << "ERROR: part1 failed" << std::endl;
@@ -125,6 +158,7 @@ int main(int argc, char** argv) {
 			}
 		}
 		if (opts.exec_part2) {
+			std::cout << "-- Part 2 --" << std::endl;
 			okay = puzzle->part2();
 			if(!okay) {
 				std::cerr << "ERROR: part2 failed" << std::endl;
