@@ -56,7 +56,7 @@ std::vector<std::string> string_split(std::string s, std::string delim) {
 			break;
 		}
 		parts.push_back(s.substr(i,pos-i));
-		i = pos + 1;
+		i = pos + delim.length();
 	}
 	return parts;
 }
