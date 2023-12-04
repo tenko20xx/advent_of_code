@@ -1,2 +1,2 @@
 aoc:
-	g++ AoC.cpp day*.cpp -o AoC2023
+	g++ -std=c++17 AoC.cpp day*.cpp -o AoC2023
