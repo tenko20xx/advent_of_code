@@ -25,7 +25,7 @@ namespace AoCModules {
 
 def gen_header(silent=False):
     days = []
-    for f in os.listdir():
+    for f in sorted(os.listdir(),key=lambda x: int(x.replace("day","").replace(".cpp","")) if x.startswith("day") else 999):
         if f.startswith("day") and f.endswith(".cpp"):
             days.append(f[3:f.find(".")])
 
