@@ -7,6 +7,10 @@
 #include <exception>
 #include <vector>
 
+typedef unsigned int uint;
+typedef unsigned long long uint64;
+typedef long long int64;
+
 class AoC {
 	public:
 		void tprint(std::string msg) { if(test_mode) std::cout << msg << std::endl; };
