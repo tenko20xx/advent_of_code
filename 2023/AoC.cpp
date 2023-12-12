@@ -22,13 +22,21 @@ std::string AoC::getInputFileName(std::string subpart) {
 
 std::ifstream AoC::getInputFile() {
 	std::ifstream fp;
-	fp.open(this->getInputFileName());
+	auto fname = getInputFileName();
+	fp.open(fname);
+	if(!fp) {
+		std::cerr << "ERROR: Unable to open file '" << fname << "'" << std::endl;
+	}
 	return fp;
 }
 
 std::ifstream AoC::getInputFile(std::string subpart) {
 	std::ifstream fp;
-	fp.open(this->getInputFileName(subpart));
+	auto fname = getInputFileName(subpart);
+	fp.open(fname);
+	if(!fp) {
+		std::cerr << "ERROR: Unable to open file '" << fname << "'" << std::endl;
+	}
 	return fp;
 }
 
