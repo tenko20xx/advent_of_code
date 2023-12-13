@@ -19,6 +19,7 @@ AoC *day10_create(bool test);
 AoC *day11_create(bool test);
 AoC *day12_create(bool test);
 AoC *day13_create(bool test);
+AoC *day14_create(bool test);
 
 using ModuleFuncPtr = AoC* (*)(bool);
 
@@ -36,7 +37,8 @@ namespace AoCModules {
 		{"day10", day10_create},
 		{"day11", day11_create},
 		{"day12", day12_create},
-		{"day13", day13_create}
+		{"day13", day13_create},
+		{"day14", day14_create}
 	};
 };
 
