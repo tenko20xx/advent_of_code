@@ -34,7 +34,7 @@ class Day13 : public AoC {
 	};
 	std::vector<Pattern*> patterns;
 	void clear();
-	void parse_patterns(std::ifstream fp);
+	void parse_patterns(std::ifstream& fp);
 	int find_vertical_reflection(Pattern&);
 	int find_horizontal_reflection(Pattern&);
 	std::set<int> find_vertical_reflections(Pattern&);
@@ -116,7 +116,7 @@ void Day13::clear() {
 	patterns.clear();
 }
 
-void Day13::parse_patterns(std::ifstream fp) {
+void Day13::parse_patterns(std::ifstream& fp) {
 	//std::cout << "parse_patterns" << std::endl;
 	clear();
 	std::string line;
@@ -331,6 +331,6 @@ bool Day13::part2() {
 	return true;
 }
 
-Day13 *day13_create(bool test) {
-	return new Day13(test);
+Day13 *day13_create() {
+	return new Day13;
 }

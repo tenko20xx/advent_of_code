@@ -24,7 +24,7 @@ class Day8 : public AoC {
 	
 	std::map<std::string,Node*> nodes;
 
-	void parse_document(std::ifstream fp);
+	void parse_document(std::ifstream& fp);
 	char get_next_instruction();
 	void reset_instruction();
 	void clear();
@@ -47,7 +47,7 @@ void Day8::reset_instruction() {
 	instr_it = instructions.begin();
 }
 
-void Day8::parse_document(std::ifstream fp) {
+void Day8::parse_document(std::ifstream& fp) {
 	clear();
 	std::string line;
 	std::getline(fp,line);
@@ -96,12 +96,12 @@ bool Day8::part1() {
 		char instr;
 		Node *current = nodes.at("AAA");
 		while(current->name != "ZZZ") {
-			if(test_mode)
+			if(isVerbose())
 				std::cout << (steps+1) << ":" << current->name << " -> ";
 			instr = get_next_instruction();
 			if(instr == 'L') current = current->left;
 			if(instr == 'R') current = current->right;
-			if(test_mode)
+			if(isVerbose())
 				std::cout << current->name << std::endl;
 			steps++;
 		}
@@ -142,11 +142,11 @@ bool Day8::part2() {
 			steps = 0;
 			while(n->name[2] != 'Z') {
 				instr = get_next_instruction();
-				if(test_mode)
+				if(isVerbose())
 					std::cout << (steps+1) << ":" << n->name << " -> ";
 				if(instr == 'L') n = n->left;
 				if(instr == 'R') n = n->right;
-				if(test_mode)
+				if(isVerbose())
 					std::cout << n->name << std::endl;
 				steps++;
 			}
@@ -155,7 +155,7 @@ bool Day8::part2() {
 		uint64 total_steps = 1;
 		for(auto &it : node_steps) {
 			int steps = it.second;
-			std::cout << (it.first)->name << " -- " << steps << std::endl;
+			if(isVerbose()) std::cout << (it.first)->name << " -- " << steps << std::endl;
 			total_steps = (total_steps * steps) / std::gcd(total_steps,steps);
 		}
 		std::cout << "Total steps taken to reach all nodes ending in Z: " << total_steps << std::endl;
@@ -165,6 +165,6 @@ bool Day8::part2() {
 	return true;
 }
 
-Day8 *day8_create(bool test) {
-	return new Day8(test);
+Day8 *day8_create() {
+	return new Day8;
 }

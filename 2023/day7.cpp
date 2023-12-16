@@ -105,7 +105,7 @@ namespace Day7NS {
 		};
 	} handCmp;
 
-	std::vector<Hand> parse_hands(std::ifstream fp) {
+	std::vector<Hand> parse_hands(std::ifstream& fp) {
 		std::vector<Hand> hands;
 		std::string line;
 		while(std::getline(fp,line)) {
@@ -157,6 +157,6 @@ bool Day7::part2() {
 	return true;
 }
 
-Day7 *day7_create(bool test) {
-	return new Day7(test);
+Day7 *day7_create() {
+	return new Day7;
 }

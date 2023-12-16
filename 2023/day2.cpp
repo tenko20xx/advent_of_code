@@ -18,7 +18,7 @@ namespace Day2NS {
 	typedef std::map<std::string,int> Handful;
 	typedef std::vector<Handful> Game;
 
-	std::map<int,Game> read_games(std::ifstream fp) {
+	std::map<int,Game> read_games(std::ifstream& fp) {
 		std::map<int,Game> games;
 		std::string line;
 		int li = 1;
@@ -79,12 +79,12 @@ bool Day2::part1() {
 				if(!possible_game) break;
 			}
 			if(possible_game) {
-				if(test_mode) {
+				if(verbosity >= 1) {
 					std::cout << "Game " << gid << " is possible" << std::endl;
 				}
 				id_sum += gid;
 			} else {
-				if(test_mode) {
+				if(verbosity >= 1) {
 					std::cout << "Game " << gid << " is impossible" << std::endl;
 				}
 			}
@@ -118,7 +118,7 @@ bool Day2::part2() {
 				}
 			}
 			int power = minset["red"] * minset["green"] * minset["blue"];
-			if(test_mode) {
+			if(verbosity >= 1) {
 				std::cout << "Game " << gid << " power: " << power << std::endl;
 			}
 			power_sum += power;
@@ -131,6 +131,6 @@ bool Day2::part2() {
 	return true;
 }
 
-Day2 *day2_create(bool test) {
-    return new Day2(test);
+Day2 *day2_create() {
+    return new Day2;
 }

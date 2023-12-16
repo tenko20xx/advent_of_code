@@ -32,7 +32,7 @@ class Day14 : public AoC {
 		int width;
 		int height;
 	} platform;
-	void parse_platform(std::ifstream fp);
+	void parse_platform(std::ifstream& fp);
 	void clear();
 	RepeatingSequence find_repeating_sequence(std::vector<int>);
 };
@@ -133,7 +133,7 @@ void Day14::clear() {
 	platform.clear();
 }
 
-void Day14::parse_platform(std::ifstream fp) {
+void Day14::parse_platform(std::ifstream& fp) {
 	clear();
 	if(!fp) {
 		throw ParseException(0,"Unable to read input file");
@@ -248,6 +248,6 @@ bool Day14::part2() {
 	return true;
 }
 
-Day14 *day14_create(bool test) {
-	return new Day14(test);
+Day14 *day14_create() {
+	return new Day14;
 }

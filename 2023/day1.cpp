@@ -13,7 +13,7 @@ class Day1 : public AoC {
 
 bool Day1::part1() {
 	//std::cout << this->getInputFileName() << std::endl;
-	std::ifstream file = this->getInputFile();
+	std::ifstream& file = getInputFile();
 	std::string line;
 	int n1,n2,total;
 	total = 0;
@@ -33,7 +33,7 @@ bool Day1::part1() {
 			}
 		}
 		int this_sum = n1*10 + n2;
-		if(this->test_mode) 
+		if(verbosity >= 1) 
 			std::cout << line << " -> " << this_sum << std::endl;
 		total += this_sum;
 	}
@@ -64,12 +64,16 @@ bool Day1::part2() {
 		{"eight",	8},
 		{"nine",	9}
 	};
-	std::ifstream file = test_mode ? this->getInputFile("test2") : this->getInputFile();
+	if(test_mode) {
+		openInputFile("test2");
+	} else {
+		openInputFile();
+	}
 	std::string line;
 	int n1,n2,total;
 	total = 0;
 	auto print_pair = [](std::pair<int,std::string> p){ std::cout << p.first << ":" << p.second << std::endl; };
-	while(std::getline(file,line)) {
+	while(std::getline(inputFile_fp,line)) {
 		tprint(line);
 		std::pair<int,std::string> firstFound = {-1,""};
 		std::pair<int,std::string> lastFound = {-1,""};
@@ -88,7 +92,7 @@ bool Day1::part2() {
 				lastFound.second = key;
 			}
 		}
-		if(this->test_mode) {
+		if(verbosity >= 1) {
 			print_pair(firstFound);
 			print_pair(lastFound);
 		}
@@ -102,6 +106,6 @@ bool Day1::part2() {
 	return true;
 }
 
-Day1 *day1_create(bool test) { 
-	return new Day1(test);
+Day1 *day1_create() { 
+	return new Day1();
 }

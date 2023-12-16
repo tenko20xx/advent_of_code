@@ -69,7 +69,7 @@ namespace Day5NS {
 		mappings.push_back({src,dst,range});
 	}
 
-	std::pair<std::vector<uint64>,std::map<std::string,Translation>> parse_translations(std::ifstream fp) {
+	std::pair<std::vector<uint64>,std::map<std::string,Translation>> parse_translations(std::ifstream& fp) {
 		std::vector<uint64> seeds;
 		std::string line;
 		std::getline(fp,line);
@@ -299,6 +299,6 @@ bool Day5::part2() {
 	return true;
 }
 
-Day5 *day5_create(bool test) {
-	return new Day5(test);
+Day5 *day5_create() {
+	return new Day5;
 }

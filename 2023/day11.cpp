@@ -30,7 +30,7 @@ class Day11 : public AoC {
 		int64 min_y;
 		int64 max_y;
 	} universe;
-	void parse_universe(std::ifstream fp);
+	void parse_universe(std::ifstream& fp);
 	void clear();
 };
 
@@ -151,7 +151,7 @@ void Day11::clear() {
 	universe.clear();
 }
 
-void Day11::parse_universe(std::ifstream fp) {
+void Day11::parse_universe(std::ifstream& fp) {
 	clear();
 	std::string line;
 	int64 x=0;
@@ -173,7 +173,8 @@ void Day11::parse_universe(std::ifstream fp) {
 
 bool Day11::part1() {
 	try {
-		parse_universe(getInputFile());
+		openInputFile();
+		parse_universe(inputFile_fp);
 		if(test_mode)
 			universe.print();
 		universe.expand();
@@ -212,7 +213,8 @@ bool Day11::part2() {
 		}
 		factors.push_back(1000000);
 		for(int f : factors) {
-			parse_universe(getInputFile());
+			openInputFile();
+			parse_universe(inputFile_fp);
 			if(test_mode)
 				universe.print();
 			universe.expand(f);
@@ -235,6 +237,6 @@ bool Day11::part2() {
 	return true;
 }
 
-Day11 *day11_create(bool test) {
-	return new Day11(test);
+Day11 *day11_create() {
+	return new Day11;
 }

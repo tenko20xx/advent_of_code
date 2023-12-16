@@ -20,7 +20,7 @@ namespace Day3NS {
 		const char get_char(unsigned int row, unsigned int col) { return data[get_index(row,col)]; }
 		const unsigned int get_width() { return width; }
 		const unsigned int get_height() { return height; }
-		Schematic(std::ifstream fp);
+		Schematic(std::ifstream& fp);
 		~Schematic();
 		private:
 		char* data;
@@ -28,7 +28,7 @@ namespace Day3NS {
 		unsigned int height;
 	};
 	
-	Schematic::Schematic(std::ifstream fp) {
+	Schematic::Schematic(std::ifstream& fp) {
 		data = new char[MAX_DATA_SIZE];
 		std::string line;
 		width = 0;
@@ -196,6 +196,6 @@ bool Day3::part2() {
 	return true;
 }
 
-Day3 *day3_create(bool test) {
-	return new Day3(test);
+Day3 *day3_create() {
+	return new Day3;
 }

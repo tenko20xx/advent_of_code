@@ -7,8 +7,21 @@
 
 std::string prog_name;
 
-AoC::AoC(bool test_mode) : test_mode(test_mode) {
-};
+AoC::AoC() : test_mode(false), verbosity(0), name("base") {
+	inputFileOpened = false;
+}
+
+AoC::~AoC() {
+	closeInputFile();
+}
+
+void AoC::closeInputFile() {
+	if(inputFileOpened) {
+		inputFile_fp.close();
+		inputFile_fp.clear();
+	}
+	inputFileOpened = false;
+}
 
 std::string AoC::getInputFileName() {
 	if(test_mode)
@@ -20,24 +33,39 @@ std::string AoC::getInputFileName(std::string subpart) {
 	return "inputs/" + this->name + (subpart == "" ? "" : "." + subpart) + ".input";
 }
 
-std::ifstream AoC::getInputFile() {
-	std::ifstream fp;
-	auto fname = getInputFileName();
-	fp.open(fname);
-	if(!fp) {
-		std::cerr << "ERROR: Unable to open file '" << fname << "'" << std::endl;
-	}
-	return fp;
+std::ifstream& AoC::getInputFile() {
+	openInputFile();
+	return inputFile_fp;
 }
 
-std::ifstream AoC::getInputFile(std::string subpart) {
-	std::ifstream fp;
-	auto fname = getInputFileName(subpart);
-	fp.open(fname);
-	if(!fp) {
+std::ifstream& AoC::getInputFile(std::string subpart) {
+	openInputFile(subpart);
+	return inputFile_fp;
+}
+
+
+void AoC::openInputFile() {
+	closeInputFile();
+	auto fname = getInputFileName();
+	if(isVerbose(3)) 
+		std::cout << "Opening input file \"" << fname << "\"" << std::endl;
+	inputFile_fp.open(fname);
+	if(!inputFile_fp) {
 		std::cerr << "ERROR: Unable to open file '" << fname << "'" << std::endl;
 	}
-	return fp;
+	inputFileOpened = true;
+}
+
+void AoC::openInputFile(std::string subpart) {
+	closeInputFile();
+	auto fname = getInputFileName(subpart);
+	if(isVerbose(3)) 
+		std::cout << "Opening input file \"" << fname << "\"" << std::endl;
+	inputFile_fp.open(fname);
+	if(!inputFile_fp) {
+		std::cerr << "ERROR: Unable to open file '" << fname << "'" << std::endl;
+	}
+	inputFileOpened = true;
 }
 
 const char* ParseException::what() {
@@ -80,6 +108,7 @@ struct Options {
 	bool has_errors = false;
 	bool exec_part1 = false;
 	bool exec_part2 = false;
+	int verbosity = 0;
 	std::vector<std::string> error_messages;
 };
 
@@ -89,6 +118,7 @@ void show_help() {
 	std::cout << "  -h,--help          Show this message and exit" << std::endl;
 	std::cout << "  -t,--test          Execute in test mode" << std::endl;
 	std::cout << "  -l,--list          List available days" << std::endl;
+	std::cout << "  -v,--verbose       Be verbose (pass multiple times for more verbosity [max:3])" << std::endl;
 	std::cout << "  --part1,--part2    Execute part1 or part2 (leave absent to exec both)" << std::endl;
 }
 
@@ -96,41 +126,69 @@ Options parse_args(int argc, char** argv) {
 	Options ret;
 	for(int i=1;i<argc;i++) {
 		std::string arg = argv[i];
-		if(arg == "-h" || arg == "--help") {
-			ret.show_help = true;
-			break;
-		} else if (arg == "-t" || arg == "--test") {
-			ret.test_mode = true;
-		} else if (arg == "-l" || arg == "--list") {
-			ret.list_days = true;
-		} else if (arg == "--part1") {
-			ret.exec_part1 = true;
-		} else if (arg == "--part2") {
-			ret.exec_part2 = true;
-		} else if (arg[0] != '-') {
+		if(arg.length() >= 2 && arg.substr(0,2) == "--") {
+			auto opt = arg.substr(2);
+			if(opt == "help") {
+				ret.show_help = true;
+				break;
+			} else if (opt == "test") {
+				ret.test_mode = true;
+			} else if (opt == "list") {
+				ret.list_days = true;
+			} else if (opt == "part1") {
+				ret.exec_part1 = true;
+			} else if (opt == "part2") {
+				ret.exec_part2 = true;
+			} else if (opt == "verbose") {
+				ret.verbosity++;
+			} else {
+				ret.has_errors = true;
+				ret.error_messages.push_back("Unknown argument: " + arg);
+				break;
+			}
+		} else if (arg.length() >= 1 && arg[0] == '-') {
+			for(auto c : arg.substr(1)) {
+				if(c == 'h') {
+					ret.show_help = true;
+					break;
+				} else if(c == 't') {
+					ret.test_mode = true;
+				} else if (c == 'l') {
+					ret.list_days = true;
+				} else if (c == 'v') {
+					ret.verbosity++;
+				} else {
+					ret.has_errors = true;
+					ret.error_messages.push_back("Unknown option: " + c);
+					break;
+				}
+			}
+			if(ret.has_errors || ret.show_help) break;
+		} else {
 			if(ret.exec_day == "") {
 				ret.exec_day = arg;
 			} else {
 				ret.has_errors = true;
 				ret.error_messages.push_back("Cannot pass more than one day");
+				break;
 			}
-		} else {
-			ret.has_errors = true;
-			ret.error_messages.push_back("Unknown argument: " + arg);
-			break;
 		}
 	}
 	if (!ret.exec_part1 && !ret.exec_part2) {
 		ret.exec_part1 = true;
 		ret.exec_part2 = true;
 	}
+	if(ret.verbosity > 3) ret.verbosity = 3;
+	if(ret.test_mode && ret.verbosity == 0) ret.verbosity = 1;
 	return ret;
 }
 
-int execute_module(std::string module_name, bool test_mode, bool xpart1, bool xpart2) {
-	auto fn = *(AoCModules::modules.at(module_name));
-	AoC *puzzle = fn(test_mode);
+int execute_module(std::string module_name, bool test_mode, bool xpart1, bool xpart2, int verbosity = 0) {
+	auto factory = *(AoCModules::modules.at(module_name));
+	AoC *puzzle = factory();
 	puzzle->setName(module_name);
+	puzzle->setTestMode(test_mode);
+	puzzle->setVerbosity(verbosity);
 	std::cout << "** " << module_name << " **" << std::endl << std::endl;
 	bool okay;
 	if (xpart1) {
@@ -149,6 +207,7 @@ int execute_module(std::string module_name, bool test_mode, bool xpart1, bool xp
 			return 13;
 		}
 	}
+	delete puzzle;
 	return 0;
 }
 
@@ -179,12 +238,13 @@ int main(int argc, char** argv) {
 	}
 	if(opts.exec_day == "all") {
 		for(auto &day : AoCModules::modules_order) {
-			execute_module(day,opts.test_mode,opts.exec_part1,opts.exec_part2);
+			execute_module(day,opts.test_mode,opts.exec_part1,opts.exec_part2,opts.verbosity);
+			std::cout << std::endl << std::endl;
 		}
 		return 0;
 	}
 	else if(AoCModules::modules.find(opts.exec_day) != AoCModules::modules.end()) {
-		int rc = execute_module(opts.exec_day,opts.test_mode,opts.exec_part1,opts.exec_part2);
+		int rc = execute_module(opts.exec_day,opts.test_mode,opts.exec_part1,opts.exec_part2,opts.verbosity);
 		return rc;
 	} else {
 		std::cerr << "ERROR: There is no " << opts.exec_day << std::endl;

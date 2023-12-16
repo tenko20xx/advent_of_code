@@ -39,7 +39,7 @@ class Day10 : public AoC {
 		void fill(Position p, char c);
 	} map;
 	void clear();
-	void parse_map(std::ifstream fp);
+	void parse_map(std::ifstream& fp);
 };
 
 namespace Day10NS {
@@ -197,7 +197,7 @@ void Day10::clear() {
 	map.clear();
 }
 
-void Day10::parse_map(std::ifstream fp) {
+void Day10::parse_map(std::ifstream& fp) {
 	clear();
 	std::string line;
 	int h=0;
@@ -219,7 +219,8 @@ void Day10::parse_map(std::ifstream fp) {
 
 bool Day10::part1() {
 	try {
-		parse_map(getInputFile());
+		openInputFile();
+		parse_map(inputFile_fp);
 		if(test_mode) map.print();
 		//std::cout << "Start: " << map.start.to_string() << std::endl;
 		Position p1 = map.start;
@@ -295,9 +296,10 @@ bool Day10::part2() {
 		while(!file_q.empty()) {
 			auto file_name = file_q.front();
 			file_q.pop();
-			if(test_mode) std::cout << "File: " << file_name << std::endl;
-			parse_map(getInputFile(file_name));
-			if(test_mode) map.print();
+			if(isVerbose()) std::cout << "File: " << file_name << std::endl;
+			openInputFile(file_name);
+			parse_map(inputFile_fp);
+			if(isVerbose()) map.print();
 			//std::cout << "Start: " << map.start.to_string() << std::endl;
 			Position p1 = map.start;
 			char p1_prev = '?';
@@ -421,6 +423,6 @@ bool Day10::part2() {
 	return true;
 }
 
-Day10 *day10_create(bool test) {
-	return new Day10(test);
+Day10 *day10_create() {
+	return new Day10;
 }

@@ -7,24 +7,24 @@
 #include <vector>
 #include "AoC.h"
 
-AoC *day1_create(bool test);
-AoC *day2_create(bool test);
-AoC *day3_create(bool test);
-AoC *day4_create(bool test);
-AoC *day5_create(bool test);
-AoC *day6_create(bool test);
-AoC *day7_create(bool test);
-AoC *day8_create(bool test);
-AoC *day9_create(bool test);
-AoC *day10_create(bool test);
-AoC *day11_create(bool test);
-AoC *day12_create(bool test);
-AoC *day13_create(bool test);
-AoC *day14_create(bool test);
-AoC *day15_create(bool test);
-AoC *day16_create(bool test);
+AoC *day1_create();
+AoC *day2_create();
+AoC *day3_create();
+AoC *day4_create();
+AoC *day5_create();
+AoC *day6_create();
+AoC *day7_create();
+AoC *day8_create();
+AoC *day9_create();
+AoC *day10_create();
+AoC *day11_create();
+AoC *day12_create();
+AoC *day13_create();
+AoC *day14_create();
+AoC *day15_create();
+AoC *day16_create();
 
-using ModuleFuncPtr = AoC* (*)(bool);
+using ModuleFuncPtr = AoC* (*)();
 
 namespace AoCModules {
 	std::map<std::string,ModuleFuncPtr> modules = {

@@ -45,7 +45,7 @@ class Day16 : public AoC {
 	};
 	class Contraption {
 		public:
-		void init(std::vector<std::string> lines);
+		void init(std::vector<std::string>& lines);
 		void reset_beams();
 		void clear();
 		char get_tile(int row, int col);
@@ -57,6 +57,7 @@ class Day16 : public AoC {
 		void print_energized();
 		void print_beams();
 		int count_energized();
+		Contraption() : width(0), height(0) { };
 		private:
 		char* tiles;
 		short* beams;
@@ -65,17 +66,19 @@ class Day16 : public AoC {
 		inline int get_idx(int row, int col) { return row * width + col; }
 		inline int get_idx(Position p) { return p.row * width + p.col; }
 	} contraption;
-	void parse_contraption(std::ifstream);
+	void parse_contraption(std::ifstream&);
 };
 
 void Day16::Contraption::clear() {
-	delete[] tiles;
-	delete[] beams;
+	if(width != 0 && height != 0) {
+		delete[] tiles;
+		delete[] beams;
+	}
 	width = 0;
 	height = 0;
 }
 
-void Day16::Contraption::init(std::vector<std::string> lines) {
+void Day16::Contraption::init(std::vector<std::string>& lines) {
 	clear();
 	width = lines[0].length();
 	height = lines.size();
@@ -233,7 +236,7 @@ int Day16::Contraption::count_energized() {
 	return count;
 }
 
-void Day16::parse_contraption(std::ifstream fp) {
+void Day16::parse_contraption(std::ifstream& fp) {
 	std::vector<std::string> lines;
 	std::string line;
 	while(std::getline(fp,line)) {
@@ -249,7 +252,7 @@ bool Day16::part1() {
 		parse_contraption(getInputFile());
 		Beam start = {{0, 0}, right};
 		contraption.light(start);
-		if(test_mode || true) {
+		if(verbosity >= 1) {
 			contraption.print_tiles();
 			contraption.print_beams();
 			contraption.print_energized();
@@ -298,7 +301,7 @@ bool Day16::part2() {
 		}
 		contraption.reset_beams();
 		contraption.light(best_beam);
-		if(test_mode || true) {
+		if(verbosity >= 1) {
 			std::cout << "Best beam: <(" << best_beam.pos.row << "," << best_beam.pos.col << ") ";
 		       	switch(best_beam.direction) {
 			 	case 0:
@@ -332,6 +335,6 @@ bool Day16::part2() {
 	return true;
 }
 
-Day16 *day16_create(bool test) {
-	return new Day16(test);
+Day16 *day16_create() {
+	return new Day16;
 }

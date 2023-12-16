@@ -39,7 +39,7 @@ namespace Day6NS {
 		return (double)time / 2;
 	}
 
-	std::vector<Race> parse_races(std::ifstream fp) {
+	std::vector<Race> parse_races(std::ifstream& fp) {
 		std::vector<double> times;
 		std::vector<double> distances;
 		std::string line;
@@ -126,6 +126,6 @@ bool Day6::part2() {
 	return true;
 }
 
-Day6 *day6_create(bool test) {
-	return new Day6(test);
+Day6 *day6_create() {
+	return new Day6;
 }

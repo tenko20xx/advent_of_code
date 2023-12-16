@@ -15,7 +15,7 @@ class Day9 : public AoC {
 	private:
 	typedef std::deque<int> History;
 	std::deque<History*> histories;
-	void parse_histories(std::ifstream fp);
+	void parse_histories(std::ifstream& fp);
 	int extrapolate(const History& h, bool backwards = false);
 	bool all_equal(const History& h);
 	History calc_differences(const History& h);
@@ -35,7 +35,7 @@ void Day9::clear() {
 	histories.clear();
 }
 
-void Day9::parse_histories(std::ifstream fp) {
+void Day9::parse_histories(std::ifstream& fp) {
 	clear();
 	std::string line;
 	while(std::getline(fp,line)) {
@@ -126,6 +126,6 @@ bool Day9::part2() {
 	return true;
 }
 
-Day9 *day9_create(bool test) {
-	return new Day9(test);
+Day9 *day9_create() {
+	return new Day9;
 }

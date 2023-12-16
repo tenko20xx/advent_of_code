@@ -30,7 +30,7 @@ unsigned char Day15::HASH(std::string s) {
 	return (unsigned char)h;
 }
 bool Day15::part1() {
-	auto fp = getInputFile();
+	auto &fp = getInputFile();
 	std::string line;
 	while(std::getline(fp,line)) {
 		unsigned int hash_sum = 0;
@@ -48,7 +48,7 @@ bool Day15::part1() {
 }
 
 bool Day15::part2() {
-	auto fp = getInputFile();
+	auto &fp = getInputFile();
 	std::string line;
 	while(std::getline(fp,line)) {
 		string_trim(line);
@@ -115,6 +115,6 @@ bool Day15::part2() {
 	return true;
 }
 
-Day15 *day15_create(bool test) {
-	return new Day15(test);
+Day15 *day15_create() {
+	return new Day15;
 }

@@ -55,7 +55,7 @@ namespace Day4NS {
 		return ch >= '0' && ch <= '9';
 	}
 
-	std::map<int,Card> parse_cards(std::ifstream fp) {
+	std::map<int,Card> parse_cards(std::ifstream& fp) {
 		std::string line;
 		int li = 1;
 		std::map<int,Card> cards;
@@ -157,6 +157,6 @@ bool Day4::part2() {
 	return true;
 }
 
-Day4 *day4_create(bool test) {
-	return new Day4(test);
+Day4 *day4_create() {
+	return new Day4;
 }

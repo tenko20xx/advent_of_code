@@ -16,7 +16,7 @@ class Day12 : public AoC {
 	std::vector<Record> records;
 	std::map<Record,int64> memo;
 	void clear();
-	void parse_records(std::ifstream fp);
+	void parse_records(std::ifstream& fp);
 	void print_record(const Record&);
 	int64 count_arrangements(const Record&);
 	bool valid_record(const Record&);
@@ -32,7 +32,7 @@ void Day12::clear() {
 	records.clear();
 }
 
-void Day12::parse_records(std::ifstream fp) {
+void Day12::parse_records(std::ifstream& fp) {
 	clear();
 	std::string line;
 	while(std::getline(fp,line)) {
@@ -324,6 +324,6 @@ bool Day12::part2() {
 	return true;
 }
 
-Day12 *day12_create(bool test) {
-	return new Day12(test);
+Day12 *day12_create() {
+	return new Day12;
 }
