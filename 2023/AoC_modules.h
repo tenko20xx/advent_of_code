@@ -2,8 +2,9 @@
 #ifndef AoC_modules_H
 #define AoC_modules_H
 
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 #include "AoC.h"
 
 AoC *day1_create(bool test);
@@ -21,6 +22,7 @@ AoC *day12_create(bool test);
 AoC *day13_create(bool test);
 AoC *day14_create(bool test);
 AoC *day15_create(bool test);
+AoC *day16_create(bool test);
 
 using ModuleFuncPtr = AoC* (*)(bool);
 
@@ -40,8 +42,27 @@ namespace AoCModules {
 		{"day12", day12_create},
 		{"day13", day13_create},
 		{"day14", day14_create},
-		{"day15", day15_create}
+		{"day15", day15_create},
+		{"day16", day16_create}
 	};
+    std::vector<std::string> modules_order = {
+		"day1",
+		"day2",
+		"day3",
+		"day4",
+		"day5",
+		"day6",
+		"day7",
+		"day8",
+		"day9",
+		"day10",
+		"day11",
+		"day12",
+		"day13",
+		"day14",
+		"day15",
+		"day16"
+    };
 };
 
 #endif
