@@ -310,7 +310,7 @@ bool Day12::part2() {
 			Record unfolded = unfold(r,NUM_UNFOLDS);
 			int64 c = count_arrangements(unfolded);
 			
-			if(test_mode || true) {
+			if(test_mode) {
 				std::cout << c << " -> ";
 				print_record(r);
 				std::cout << "Record " << ++num_counted << " out of " << records.size() << " counted" << std::endl;

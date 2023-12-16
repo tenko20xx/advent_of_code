@@ -145,7 +145,7 @@ bool Day7::part2() {
 		int total_winnings = 0;
 		for(auto &h : hands) {
 			int winnings = rank * h.bid;
-			if(test_mode || true)
+			if(test_mode)
 				std::cout << h.cards << "(" << Day7NS::get_hand_rank(h.cards) << ") - Rank " << rank << " | " << winnings << std::endl;
 			total_winnings += winnings;
 			rank++;

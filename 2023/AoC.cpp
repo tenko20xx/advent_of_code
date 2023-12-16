@@ -84,7 +84,7 @@ struct Options {
 };
 
 void show_help() {
-	std::cout << "usage: " << prog_name << " -h | -l | [options] day##" << std::endl;
+	std::cout << "usage: " << prog_name << " -h | -l | [options] day## | all" << std::endl;
 	std::cout << "options: " << std::endl;
 	std::cout << "  -h,--help          Show this message and exit" << std::endl;
 	std::cout << "  -t,--test          Execute in test mode" << std::endl;
@@ -127,6 +127,31 @@ Options parse_args(int argc, char** argv) {
 	return ret;
 }
 
+int execute_module(std::string module_name, bool test_mode, bool xpart1, bool xpart2) {
+	auto fn = *(AoCModules::modules.at(module_name));
+	AoC *puzzle = fn(test_mode);
+	puzzle->setName(module_name);
+	std::cout << "** " << module_name << " **" << std::endl << std::endl;
+	bool okay;
+	if (xpart1) {
+		std::cout << "-- Part 1 --" << std::endl;
+		okay = puzzle->part1();
+		if(!okay) {
+			std::cerr << "ERROR: part1 failed" << std::endl;
+			return 12;
+		}
+	}
+	if (xpart2) {
+		std::cout << "-- Part 2 --" << std::endl;
+		okay = puzzle->part2();
+		if(!okay) {
+			std::cerr << "ERROR: part2 failed" << std::endl;
+			return 13;
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	prog_name = argv[0];
 	if (argc == 1) {
@@ -147,32 +172,20 @@ int main(int argc, char** argv) {
 	}
 	if (opts.list_days) {
 		std::cout << "Available days to execute:" << std::endl;
-		for(auto &kv : AoCModules::modules) {
-			std::cout << "  " << kv.first << std::endl;
+		for(auto &day : AoCModules::modules_order) {
+			std::cout << "  " << day << std::endl;
 		}
 		return 0;
 	}
-	if(AoCModules::modules[opts.exec_day]) {
-		AoC *puzzle = AoCModules::modules[opts.exec_day](opts.test_mode);
-		puzzle->setName(opts.exec_day);
-		std::cout << "** " << opts.exec_day << " **" << std::endl << std::endl;
-		bool okay;
-		if (opts.exec_part1) {
-			std::cout << "-- Part 1 --" << std::endl;
-			okay = puzzle->part1();
-			if(!okay) {
-				std::cerr << "ERROR: part1 failed" << std::endl;
-				return 12;
-			}
+	if(opts.exec_day == "all") {
+		for(auto &day : AoCModules::modules_order) {
+			execute_module(day,opts.test_mode,opts.exec_part1,opts.exec_part2);
 		}
-		if (opts.exec_part2) {
-			std::cout << "-- Part 2 --" << std::endl;
-			okay = puzzle->part2();
-			if(!okay) {
-				std::cerr << "ERROR: part2 failed" << std::endl;
-				return 13;
-			}
-		}
+		return 0;
+	}
+	else if(AoCModules::modules.find(opts.exec_day) != AoCModules::modules.end()) {
+		int rc = execute_module(opts.exec_day,opts.test_mode,opts.exec_part1,opts.exec_part2);
+		return rc;
 	} else {
 		std::cerr << "ERROR: There is no " << opts.exec_day << std::endl;
 		return 11;

@@ -16,10 +16,6 @@ class Day{{N}} : public AoC {
 	bool part2() override;
 };
 
-namespace Day{{N}}NS {
-
-};
-
 bool Day{{N}}::part1() {
 	return false;
 }
