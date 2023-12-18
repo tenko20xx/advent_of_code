@@ -54,6 +54,7 @@ class ParseException : public std::exception {
 };
 
 std::vector<std::string> string_split(std::string s, std::string delim);
+std::string string_join(std::vector<std::string> strings, std::string delim);
 
 inline void string_trim(std::string& str) {
 	str.erase(str.find_last_not_of(" ")+1);
@@ -91,7 +92,6 @@ struct Position {
 		return "(" + std::to_string(row) + "," + std::to_string(col) + ")";
 	}
 };
-
 
 template<> struct std::hash<Position> {
 	std::size_t operator()(const Position& p) const noexcept {

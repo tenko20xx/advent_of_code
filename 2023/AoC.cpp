@@ -15,6 +15,10 @@ AoC::~AoC() {
 	closeInputFile();
 }
 
+std::ostream& operator<<(std::ostream& os, const Position& pos) {
+	return os << pos.string();
+}
+
 void AoC::closeInputFile() {
 	if(inputFileOpened) {
 		inputFile_fp.close();
@@ -95,6 +99,19 @@ std::vector<std::string> string_split(std::string s, std::string delim) {
 		i = pos + delim.length();
 	}
 	return parts;
+}
+
+std::string string_join(std::vector<std::string> strings, std::string delim) {
+	std::string s = "";
+	bool first = true;
+	for(auto part : strings) {
+		if(!first) {
+			s = s + delim;
+		}
+		s = s + part;
+		first = false;
+	}
+	return s;
 }
 //////////////////////////////
 // Stand-alone utilities
