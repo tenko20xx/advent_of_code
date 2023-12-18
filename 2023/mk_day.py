@@ -24,8 +24,8 @@ bool Day{{N}}::part2() {
 	return false;
 }
 
-Day{{N}} *day{{N}}_create(bool test) {
-	return new Day{{N}}(test);
+Day{{N}} *day{{N}}_create() {
+	return new Day{{N}}();
 }
 """
 
