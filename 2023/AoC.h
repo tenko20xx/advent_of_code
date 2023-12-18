@@ -6,6 +6,7 @@
 #include <fstream>
 #include <exception>
 #include <vector>
+#include <functional>
 
 typedef int int32;
 typedef unsigned int uint;
@@ -58,5 +59,46 @@ inline void string_trim(std::string& str) {
 	str.erase(str.find_last_not_of(" ")+1);
 	str.erase(0, str.find_first_not_of(" "));
 }
+
+struct Position {
+	int row;
+	int col;
+	bool operator==(const Position other) const {
+		return other.row == row && other.col == col;
+	}
+	bool operator!=(const Position other) const {
+		return other.row != row || other.col != col;
+	}
+	void operator=(const Position other) {
+		row = other.row;
+		col = other.col;
+	}
+	Position operator+(const Position other) const {
+		return {row + other.row, col + other.col};
+	}	
+	Position operator-(const Position other) const {
+		return {row - other.row, col - other.col};
+	}
+	void operator+=(Position other) {
+		row += other.row;
+		col += other.col;
+	}	
+	void operator-=(Position other) {
+		row -= other.row;
+		col -= other.col;
+	}
+	std::string string() const {
+		return "(" + std::to_string(row) + "," + std::to_string(col) + ")";
+	}
+};
+
+
+template<> struct std::hash<Position> {
+	std::size_t operator()(const Position& p) const noexcept {
+		std::size_t h1 = std::hash<int>{}(p.row);
+		std::size_t h2 = std::hash<int>{}(p.col);
+		return h1 ^ (h2 << 1);
+	}
+};
 
 #endif
