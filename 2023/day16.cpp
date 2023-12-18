@@ -11,27 +11,7 @@ class Day16 : public AoC {
 	using AoC::AoC;
 	bool part1() override;
 	bool part2() override;
-	struct Position {
-		int row;
-		int col;
-		bool operator==(Position other) {
-			return other.row == row && other.col == col;
-		}
-		Position operator+(Position other) {
-			return {row + other.row, col + other.col};
-		}	
-		Position operator-(Position other) {
-			return {row - other.row, col - other.col};
-		}
-		void operator+=(Position other) {
-			row += other.row;
-			col += other.col;
-		}	
-		void operator-=(Position other) {
-			row -= other.row;
-		       	col -= other.col;
-		}
-	};
+	private:
 	enum Direction : short {
 		none   = 0,
 		up     = 1,
@@ -39,6 +19,7 @@ class Day16 : public AoC {
 		down   = 4,
 		left   = 8
 	};
+
 	struct Beam {
 		Position pos;
 		Direction direction;
