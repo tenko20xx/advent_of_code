@@ -23,6 +23,8 @@ AoC *day13_create();
 AoC *day14_create();
 AoC *day15_create();
 AoC *day16_create();
+AoC *day17_create();
+AoC *day18_create();
 
 using ModuleFuncPtr = AoC* (*)();
 
@@ -43,7 +45,9 @@ namespace AoCModules {
 		{"day13", day13_create},
 		{"day14", day14_create},
 		{"day15", day15_create},
-		{"day16", day16_create}
+		{"day16", day16_create},
+		//{"day17", day17_create},
+		{"day18", day18_create}
 	};
     std::vector<std::string> modules_order = {
 		"day1",
@@ -61,7 +65,9 @@ namespace AoCModules {
 		"day13",
 		"day14",
 		"day15",
-		"day16"
+		"day16",
+		//"day17",
+		"day18"
     };
 };
 
