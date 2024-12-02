@@ -27,8 +27,8 @@ function day1.part1()
 	for line in f:lines() do
 		local n1, n2 = line:match("(%d+)%s+(%d+)")
 		if n1 and n2 then 
-			table.insert(list1,n1) 
-			table.insert(list2,n2) 
+			table.insert(list1,tonumber(n1)) 
+			table.insert(list2,tonumber(n2)) 
 		end
 	end
 	io.close(f)
@@ -38,10 +38,7 @@ function day1.part1()
 	sum = 0
 	for i,n1 in ipairs(list1) do
 		n2 = list2[i]
-		d = n1 - n2
-		if d < 0 then
-			d = -1 * d
-		end
+		d = math.abs(n1 - n2)
 		AOC.tprint(i .. " -> " .. n1 .. ":" .. n2 .. ":" .. d)
 		sum = sum + d
 	end
@@ -55,8 +52,8 @@ function day1.part2()
 	for line in f:lines() do
 		local n1, n2 = line:match("(%d+)%s+(%d+)")
 		if n1 and n2 then 
-			table.insert(list1,n1) 
-			table.insert(list2,n2) 
+			table.insert(list1,tonumber(n1)) 
+			table.insert(list2,tonumber(n2)) 
 		end
 	end
 	io.close(f)
