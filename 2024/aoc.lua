@@ -3,12 +3,19 @@ if AOC ~= nil then
 end
 AOC = {}
 AOC.test_mode = false
+AOC.debug = false
 
 local context_registered = false
 local this_context = {}
 
+function AOC.dprint(msg)
+	if AOC.debug then
+		print(msg)
+	end
+end
+
 function AOC.tprint(msg)
-	if AOC.test_mode then
+	if AOC.test_mode or AOC.debug then
 		print(msg)
 	end
 end
@@ -48,12 +55,18 @@ function AOC.start()
 	local parser = argparse(this_context.short_name,"Advent of Code -- " .. this_context.long_name)
 	parser:flag("-1 --part1","Execute Part 1")
 	parser:flag("-2 --part2","Execute Part 2")
-	parser:flag("--test", "Enable test mode")
+	parser:flag("-t --test", "Enable test mode")
+	parser:flag("-d --debug", "Enable debug output (includes test mode output)")
+	parser:option("-i --input","Use a custom input file")
 
 	local args = parser:parse()
 	if args.test then
 		AOC.test_mode = true
 		print("** TESTING **")
+	end
+
+	if args.debug then
+		AOC.debug = true
 	end
 
 	exec_p1 = args.part1 and true or false
@@ -64,14 +77,28 @@ function AOC.start()
 	end
 
 	print("== " .. this_context.long_name .. " ==")
+	local fname = args.input or AOC.get_input_file_name()
+	if args.input then
+		fname = args.input
+	end
+	local f = io.open(fname,'r')
+	if not f then
+		print("ERROR: Cannot open input file '" .. fname .. "'")
+		os.exit(8)
+	end
+	io.close(f)
 	if exec_p1 then
 		print("-- Part 1 --")
-		this_context.part1()
+		f = io.open(fname,'r')
+		this_context.part1(f)
+		io.close(f)
 	end
 
 	if exec_p2 then
 		print("-- Part 2 --")
-		this_context.part2()
+		f = io.open(fname,'r')
+		this_context.part2(f)
+		io.close(f)
 	end
 end
 
