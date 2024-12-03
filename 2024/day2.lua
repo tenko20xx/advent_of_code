@@ -106,5 +106,5 @@ function day2.part2()
 	day2.solve(true)
 end
 
-AOC.register("day2","Day2",day2.part1,day2.part2)
+AOC.register("day2","Day 2",day2.part1,day2.part2)
 AOC.start()
