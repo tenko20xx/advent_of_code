@@ -20,8 +20,7 @@ function day1.count_each(list)
 	return vals
 end
 
-function day1.part1()
-	f = AOC.get_input_file()
+function day1.part1(f)
 	list1 = {}
 	list2 = {}
 	for line in f:lines() do
@@ -31,7 +30,6 @@ function day1.part1()
 			table.insert(list2,tonumber(n2)) 
 		end
 	end
-	io.close(f)
 
 	table.sort(list1)
 	table.sort(list2)
@@ -45,8 +43,7 @@ function day1.part1()
 	print("sum: " .. sum)
 end
 
-function day1.part2()
-	f = AOC.get_input_file()
+function day1.part2(f)
 	list1 = {}
 	list2 = {}
 	for line in f:lines() do
@@ -56,7 +53,6 @@ function day1.part2()
 			table.insert(list2,tonumber(n2)) 
 		end
 	end
-	io.close(f)
 
 	uniq1 = day1.count_each(list1)
 	uniq2 = day1.count_each(list2)
